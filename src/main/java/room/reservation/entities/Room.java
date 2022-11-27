@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class Room {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	private Long Id;	// id of the room
+	private Long id;	// id of the room
 	
 	@Column(name = "name", unique = true)
 	private String name;   // name of the room
@@ -31,12 +32,24 @@ public class Room {
 	@Column(name = "number_places")
 	private int nbrplaces;   // number of available places 
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "room_equipment",
-            joinColumns = {
-                    @JoinColumn(name = "room_id", referencedColumnName = "id")},
-            inverseJoinColumns = {
-                    @JoinColumn(name = "equipment_id", referencedColumnName = "id")})
-    private Set<Equipment> ListofEquipments = new HashSet<>();
+	@ManyToMany(fetch = FetchType.LAZY,
+		      cascade = {
+		          CascadeType.PERSIST,
+		          CascadeType.MERGE
+		      })
+	@JoinTable(name = "room_equipments",joinColumns = { @JoinColumn(name = "room_id") },inverseJoinColumns = { @JoinColumn(name = "equipment_id") })
+	private Set<Equipment> equipments = new HashSet<>();
+	
+	
 
+	@ManyToMany(fetch = FetchType.LAZY,
+		      cascade = {
+		          CascadeType.PERSIST,
+		          CascadeType.MERGE
+		      })
+	@JoinTable(name = "room_requests",joinColumns = { @JoinColumn(name = "room_id") },inverseJoinColumns = { @JoinColumn(name = "request_id") })
+	private Set<Request> requests = new HashSet<>();
+	
+	 
+   
 }

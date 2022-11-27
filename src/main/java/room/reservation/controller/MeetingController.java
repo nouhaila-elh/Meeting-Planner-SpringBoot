@@ -1,4 +1,5 @@
 package room.reservation.controller;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,51 +11,50 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import room.reservation.repository.*;
-import room.reservation.serviceInterface.RoomInterface;
+import room.reservation.serviceInterface.*;
 import room.reservation.entities.*;
 @RestController
-public class RoomController {
-
+public class MeetingController {
 	
-    @Autowired
-    RoomInterface roomService;
-    
-    @Autowired
-    RoomRespository roomRespository;
-    
-    @Autowired
+	@Autowired
+    MeetingInterface meetingService;
+	
+
+	@Autowired
+    MeetingRepository meetingRepository;
+	
+	@Autowired
     EquipmentRepository equipmentRepository;
 	
-
-    
-    @PostMapping("/addroom")
-    public String addRoom(@RequestBody Room room){
-    	roomService.addRoom(room);
-        return "Added successfully";
+	
+    @PostMapping("/addmeeting")
+    public String addMeeting(@RequestBody Meeting meeting){
+    	meetingService.addMeeting(meeting);
+         return "Added successfully";
     }
     
     
-    @PostMapping("/save-equipment-to-room")
-    public String SaveEquipmentToRoom(@RequestBody Map<String, Long> map){
+    @PostMapping("/save-equipment-to-meeting")
+    public String SaveEquipmentToMeeting(@RequestBody Map<String, Long> map){
     	
     	//Find the meeting already stored in database 
-    	Optional < Room > roomToFind = roomRespository.findById(map.get("roomid"));
+    	Optional < Meeting > meetinfToFind = meetingRepository.findById(map.get("meetingid"));
     	
     	//Find the equipment already stored in database 
     	Optional < Equipment > equipmentfToFind = equipmentRepository.findById(map.get("equipmentid"));
     	Equipment equipmentFound = new Equipment();
     	
     	// if meeting found
-    	Room roomFound = new Room();
+    	Meeting meetingFound = new Meeting();
     	
-    	if (roomToFind.isPresent()) {
-    		roomFound= roomToFind.get();
+    	if (meetinfToFind.isPresent()) {
+    		meetingFound= meetinfToFind.get();
     		// if equipment found :
     		
     		if(equipmentfToFind.isPresent()) {
     			equipmentFound= equipmentfToFind.get();
-    			roomFound.getEquipments().add(equipmentFound);
-    			roomRespository.save(roomFound);
+    			meetingFound.getEquipments().add(equipmentFound);
+    			meetingRepository.save(meetingFound);
     		}
     		else {
     			 System.out.printf("No equipment found");
@@ -68,5 +68,4 @@ public class RoomController {
 		
         return "Added successfully";
     }
-
 }

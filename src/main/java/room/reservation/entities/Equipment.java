@@ -2,6 +2,9 @@ package room.reservation.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,14 +21,27 @@ import lombok.Data;
 public class Equipment {
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-	private Long Id;	// id of the equipment
+	private Long id;	// id of the equipment
 	
 	@Column(name = "name", unique = true)
 	private String name;   // name of the equipment
 	
-	@ManyToMany(mappedBy = "ListofEquipments", fetch = FetchType.LAZY)
-    private Set<Meeting> Listofmeeting = new HashSet<>();
+	@ManyToMany(fetch = FetchType.LAZY,
+		      cascade = {
+		          CascadeType.PERSIST,
+		          CascadeType.MERGE
+		      },
+		      mappedBy = "equipments")
+	@JsonIgnore
+	private Set<Meeting> meetings = new HashSet<>();
 	
-	@ManyToMany(mappedBy = "ListofEquipments", fetch = FetchType.LAZY)
-    private Set<Room> Listofroom = new HashSet<>();
+	
+	@ManyToMany(fetch = FetchType.LAZY,
+		      cascade = {
+		          CascadeType.PERSIST,
+		          CascadeType.MERGE
+		      },
+		      mappedBy = "equipments")
+	@JsonIgnore
+	private Set<Room> rooms = new HashSet<>();
 }
