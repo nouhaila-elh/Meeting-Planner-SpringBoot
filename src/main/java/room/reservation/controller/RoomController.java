@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import room.reservation.repository.*;
+import room.reservation.serviceInterface.EquipmentInterface;
 import room.reservation.serviceInterface.RoomInterface;
 import room.reservation.entities.*;
 @RestController
@@ -18,12 +19,10 @@ public class RoomController {
 	
     @Autowired
     RoomInterface roomService;
-    
+ 
     @Autowired
-    RoomRespository roomRespository;
-    
-    @Autowired
-    EquipmentRepository equipmentRepository;
+    EquipmentInterface equipmentInterface;
+  
 	
 
     
@@ -38,10 +37,10 @@ public class RoomController {
     public String SaveEquipmentToRoom(@RequestBody Map<String, Long> map){
     	
     	//Find the meeting already stored in database 
-    	Optional < Room > roomToFind = roomRespository.findById(map.get("roomid"));
+    	Optional < Room > roomToFind = roomService.findById(map.get("roomid"));
     	
     	//Find the equipment already stored in database 
-    	Optional < Equipment > equipmentfToFind = equipmentRepository.findById(map.get("equipmentid"));
+    	Optional < Equipment > equipmentfToFind = equipmentInterface.findById(map.get("equipmentid"));
     	Equipment equipmentFound = new Equipment();
     	
     	// if meeting found
@@ -54,7 +53,7 @@ public class RoomController {
     		if(equipmentfToFind.isPresent()) {
     			equipmentFound= equipmentfToFind.get();
     			roomFound.getEquipments().add(equipmentFound);
-    			roomRespository.save(roomFound);
+    			roomService.addRoom(roomFound);
     		}
     		else {
     			 System.out.printf("No equipment found");

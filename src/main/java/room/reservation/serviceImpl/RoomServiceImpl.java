@@ -1,6 +1,7 @@
 package room.reservation.serviceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,30 @@ public class RoomServiceImpl implements RoomInterface {
 
 	@Override
 	public void addRoom(Room room) {
-		Room newRoom = new Room();
-		newRoom.setName(room.getName());
-		newRoom.setNbrplaces(room.getNbrplaces());
-		roomRespository.save(newRoom);
 		
+		roomRespository.save(room);
+		
+	}
+
+
+
+	@Override
+	public List<Room> findRoomsByEquipmentsId(Long equipmentId) {
+		return roomRespository.findRoomsByEquipmentsId(equipmentId);
+	}
+
+
+
+	@Override
+	public List<Room> getAllRooms() {
+		return roomRespository.findAll();
+	}
+
+
+
+	@Override
+	public Optional<Room> findById(Long id) {
+		return roomRespository.findById(id);
 	}
 
 

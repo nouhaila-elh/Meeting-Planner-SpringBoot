@@ -19,12 +19,9 @@ public class MeetingController {
 	@Autowired
     MeetingInterface meetingService;
 	
-
 	@Autowired
-    MeetingRepository meetingRepository;
+    EquipmentInterface equipmentInterface;
 	
-	@Autowired
-    EquipmentRepository equipmentRepository;
 	
 	
     @PostMapping("/addmeeting")
@@ -38,10 +35,10 @@ public class MeetingController {
     public String SaveEquipmentToMeeting(@RequestBody Map<String, Long> map){
     	
     	//Find the meeting already stored in database 
-    	Optional < Meeting > meetinfToFind = meetingRepository.findById(map.get("meetingid"));
+    	Optional < Meeting > meetinfToFind = meetingService.findById(map.get("meetingid"));
     	
     	//Find the equipment already stored in database 
-    	Optional < Equipment > equipmentfToFind = equipmentRepository.findById(map.get("equipmentid"));
+    	Optional < Equipment > equipmentfToFind = equipmentInterface.findById(map.get("equipmentid"));
     	Equipment equipmentFound = new Equipment();
     	
     	// if meeting found
@@ -54,7 +51,7 @@ public class MeetingController {
     		if(equipmentfToFind.isPresent()) {
     			equipmentFound= equipmentfToFind.get();
     			meetingFound.getEquipments().add(equipmentFound);
-    			meetingRepository.save(meetingFound);
+    			meetingService.addMeeting(meetingFound);
     		}
     		else {
     			 System.out.printf("No equipment found");

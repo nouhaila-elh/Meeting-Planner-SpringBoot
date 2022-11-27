@@ -1,4 +1,5 @@
 package room.reservation.serviceImpl;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,14 @@ public class RequestServiceImpl implements RequestInterface {
 
 	@Override
 	public void addRequest(Request request) {
-		Request newRequest = new Request();
-		newRequest.setDate(request.getDate());
-		newRequest.setStartingHour(request.getStartingHour());
-		newRequest.setEndingHour(request.getEndingHour());
-		newRequest.setNbrPersons(request.getNbrPersons());
-		requestRespository.save(newRequest);	
+	
+		requestRespository.save(request);	
+	}
+
+
+
+	@Override
+	public List<Request> FindRequestByRoomId(Long id) {
+		return requestRespository.findRequestsByRoomsId(id);
 	}
 }

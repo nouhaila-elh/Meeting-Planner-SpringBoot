@@ -24,23 +24,16 @@ import room.reservation.entities.*;
 public class RequestController {
 	@Autowired
     RequestInterface requestInterface;
-	
-	@Autowired
-    RequestRepository requestRepository;
-	
-	@Autowired
-    MeetingRepository meetingRepository;
-	
+
 	@Autowired
     MeetingInterface meetingService;
+	
+	@Autowired
+    EquipmentInterface equipmentInterface;
 
-	
 	@Autowired
-    EquipmentRepository equipmentRepository;
-	
-	@Autowired
-    RoomRespository roomRepository;
-	
+    RoomInterface roomInterface;
+
 	
 	@PostMapping("/save-request")
     public String SaveRequest(@RequestBody RequestToSend requestToSend){
@@ -48,7 +41,7 @@ public class RequestController {
 		Long meetingid = requestToSend.getMeetingid();
 		
 		// find the meeting object by id
-		Optional < Meeting > meetinfToFind = meetingRepository.findById(meetingid);
+		Optional < Meeting > meetinfToFind = meetingService.findById(meetingid);
 		
 		// if the meeting found 
 		Meeting meetingFound = new Meeting();
@@ -65,7 +58,7 @@ public class RequestController {
 			
 			// save the request 
 			
-			requestRepository.save(requestToSave);
+			requestInterface.addRequest(requestToSave);
 
 			
         } else {
@@ -104,7 +97,7 @@ public class RequestController {
         }
 		
 		// Find the list of equipments needed for this type of meeting
-		List<Equipment> equipmentsNeeded = equipmentRepository.findEquipmentsByMeetingsId(meetingType.getId());
+		List<Equipment> equipmentsNeeded = equipmentInterface.findEquipmentsByMeetingsId(meetingType.getId());
 		
 		// this list will have all rooms with those equipments
 		List<Room> RoomsWithEquipments = new ArrayList<>();
@@ -117,7 +110,7 @@ public class RequestController {
 			for(Equipment equipment : equipmentsNeeded) {
 				
 				// search for the rooms by equipment id 
-				List<Room> roomsNeeded = roomRepository.findRoomsByEquipmentsId(equipment.getId());
+				List<Room> roomsNeeded = roomInterface.findRoomsByEquipmentsId(equipment.getId());
 				
 				for(Room r :roomsNeeded) {
 					// only keep rooms with ==> capacity*70 /100 >= number of persons
@@ -133,7 +126,7 @@ public class RequestController {
 		}
 		else {
 			// if there is no needed equipment, we will store all rooms that have capacity > 3
-			List<Room> roomsNeeded = roomRepository.findAll();
+			List<Room> roomsNeeded = roomInterface.getAllRooms();
 			for(Room r :roomsNeeded) {
 				// only keep rooms with ==> capacity > 3
 				if(r.getNbrplaces() >= 3){
@@ -173,7 +166,7 @@ public class RequestController {
 		    
 		    // find the room already stored in the DB
 		    Room ChosenRoom = new Room();
-			Optional < Room > TheChosenRoom = roomRepository.findById(id);
+			Optional < Room > TheChosenRoom = roomInterface.findById(id);
 			
 			if (TheChosenRoom.isPresent()) {
 				ChosenRoom = TheChosenRoom.get();
@@ -183,7 +176,7 @@ public class RequestController {
 	        }
 			
 			// check if there is reservations in this room at the same time wanted in the request
-		    List<Request> requestWithSameRoom = requestRepository.findRequestsByRoomsId(id);
+		    List<Request> requestWithSameRoom = requestInterface.FindRequestByRoomId(id);
 		    System.out.println(requestWithSameRoom);
 		   
 		    // if there is reservations :
@@ -216,10 +209,10 @@ public class RequestController {
 			   }
 			   else {
 				   // if this room is available so we will use it for the reservation
-				   System.out.println("haaha possible de réserver cette salle à cet heure "+id);
+				   System.out.println("The best room for this request is the one with id : "+id);
 				   ChosenRoom.getRequests().add(OfficialRequest);
-				   roomRepository.save(ChosenRoom);
-				   break;
+				   roomInterface.addRoom(ChosenRoom);
+				   return "The best room for this request is : "+ ChosenRoom.getName() ;
 			   }
 		    	
 		    }
@@ -227,20 +220,21 @@ public class RequestController {
 	  
 		    else {
 		    	// if this room is available so we will use it for the reservation
-		    	System.out.println("LALA posible de réserver cette salle à cet heure "+id);
+		    	System.out.println("The best room for this request is the one with id"+id);
 		    	
 		    	
 		    	//save the chosen room with the request
 		    	ChosenRoom.getRequests().add(OfficialRequest);
-				roomRepository.save(ChosenRoom);
+		    	roomInterface.addRoom(ChosenRoom);
 		    	
-		    	break;
+		    	return "The best room for this request is : "+ ChosenRoom.getName()  ;
+		    	
 		    }
 		    
 		   
 		   
 		}
 		
-         return "";
+         return "there is no rooms available";
     }
 }

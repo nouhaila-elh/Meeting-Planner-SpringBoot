@@ -18,9 +18,8 @@ public class MeetingServiceImpl  implements MeetingInterface  {
 
 	@Override
 	public void addMeeting(Meeting meeting) {
-		Meeting newMeeting = new Meeting();
-		newMeeting.setType(meeting.getType());
-		meetingRespository.save(newMeeting);
+		
+		meetingRespository.save(meeting);
 		
 	}
 
